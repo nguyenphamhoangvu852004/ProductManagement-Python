@@ -1,0 +1,5 @@
+from AddProduct.onViewData.AddProductHangHoaOnView import AddProductHangHoaOnView
+
+
+class AddProductHangSanhSuOnView(AddProductHangHoaOnView):
+    def __init__(self,tenHang,soLuongTon,donGia,tenLoaiHang,nhaSanXuat,ngayNhapKho):

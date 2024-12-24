@@ -1,0 +1,10 @@
+from AddProduct.dtos.AddProductHangHoaInputDTO import AddProductHangHoaInputDTO
+
+
+class AddProductHangThucPhamInputDTO(AddProductHangHoaInputDTO):
+    def __init__(self, tenHang, soLuongTon, donGia, loaiHang, ngaySanXuat, ngayHetHan, nhaCungCap):
+        super().__init__(tenHang, soLuongTon, donGia, loaiHang)
+        self.ngaySanXuat = ngaySanXuat
+        self.ngayHetHan = ngayHetHan
+        self.nhaCungCap = nhaCungCap
+        pass

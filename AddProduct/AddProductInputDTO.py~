@@ -1,0 +1,6 @@
+from Intefaces.RequestData import RequestData
+
+
+class AddProductInputDTO(RequestData):
+    def __init__(self,tenHang,soLuongTon,donGia, loaiHang, thoiGianBaoHanh,congSuat,nhaSanXuat,ngayNhapKho,ngaySanXuat,ngayHetHan,nhaCungCap):
+        super().__init__()

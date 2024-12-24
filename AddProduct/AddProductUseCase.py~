@@ -1,0 +1,105 @@
+from contextlib import nullcontext
+from datetime import datetime
+from typing import override
+
+from AddProduct.AddProductOutputDTO import AddProductOutputDTO
+from AddProduct.dtos.AddProductHangDienMayInputDTO import AddProductHangDienMayInputDTO
+from AddProduct.dtos.AddProductHangSanhSuInputDTO import AddProductHangSanhSuInputDTO
+from AddProduct.dtos.AddProductHangThucPhamInputDTO import AddProductHangThucPhamInputDTO
+from Entity.HangDienMay import HangDienMay
+from Entity.HangSanhSu import HangSanhSu
+from Entity.HangThucPham import HangThucPham
+from Intefaces.DatabaseBoundary import DatabaseBoundary
+from Intefaces.InputBoundary import InputBoundary
+from Intefaces.OutputBoundary import OutputBoundary
+from Intefaces.RequestData import RequestData
+
+
+class AddProductUseCase(InputBoundary):
+    def __init__(self, databaseBoundary: DatabaseBoundary, presenter: OutputBoundary):
+        self.databaseBoundary = databaseBoundary
+        self.presenter = presenter
+        super().__init__()
+        pass
+
+    @override
+    def execute(self, requestData: RequestData):
+        if isinstance(requestData, AddProductHangSanhSuInputDTO):
+            # Chuyển đổi ngày nhập kho từ dd/mm/yyyy sang yyyy-mm-dd
+            try:
+                ngayNhapKho = datetime.strptime(requestData.ngayNhapKho, "%d/%m/%Y").strftime("%Y-%m-%d")
+            except ValueError as e:
+                print(f"Lỗi khi chuyển đổi ngày: {e}")
+                return  # Hoặc xử lý lỗi một cách khác nếu cần
+
+            # Tạo đối tượng sản phẩm với ngày đã chuyển đổi
+            product = HangSanhSu(nullcontext,
+                                 requestData.tenHang,
+                                 requestData.soLuongTon,
+                                 requestData.donGia,
+                                 "HSS",
+                                 requestData.nhaSanXuat,
+                                 ngayNhapKho)  # Sử dụng ngày đã chuyển đổi
+
+            if self.databaseBoundary.addProduct(product) == True:
+                responseData = AddProductOutputDTO(
+                    True,
+                    "Them hang hoa thanh cong"
+                )
+                self.presenter.exportData(responseData)
+            else:
+                responseData = AddProductOutputDTO(
+                    False,
+                    "Them hang hoa that bai"
+                )
+                self.presenter.exportData(responseData)
+        # Tương tự với các đối tượng khác như HangDienMay, HangThucPham
+        if isinstance(requestData, AddProductHangDienMayInputDTO):
+            product = HangDienMay(nullcontext,
+                                  requestData.tenHang,
+                                  requestData.soLuongTon,
+                                  requestData.donGia,
+                                  "HDM",
+                                  requestData.thoiGianBaoHanh,
+                                  requestData.congSuat)
+            if self.databaseBoundary.addProduct(product) == True:
+                responseData = AddProductOutputDTO(
+                    True,
+                    "Them hang hoa thanh cong"
+                )
+                self.presenter.exportData(responseData)
+            else:
+                responseData = AddProductOutputDTO(
+                    False,
+                    "Them hang hoa that bai"
+                )
+                self.presenter.exportData(responseData)
+        if isinstance(requestData, AddProductHangThucPhamInputDTO):
+            # Xử lý ngày trong HangThucPham (nếu có)
+            try:
+                ngaySanXuat = datetime.strptime(requestData.ngaySanXuat, "%d/%m/%Y").strftime("%Y-%m-%d")
+                ngayHetHan = datetime.strptime(requestData.ngayHetHan, "%d/%m/%Y").strftime("%Y-%m-%d")
+            except ValueError as e:
+                print(f"Lỗi khi chuyển đổi ngày: {e}")
+                return
+
+            product = HangThucPham(nullcontext,
+                                   requestData.tenHang,
+                                   requestData.soLuongTon,
+                                   requestData.donGia,
+                                   "HTP",
+                                   ngaySanXuat,
+                                   ngayHetHan,
+                                   requestData.nhaCungCap)
+            if self.databaseBoundary.addProduct(product) == True:
+                responseData = AddProductOutputDTO(
+                    True,
+                    "Them hang hoa thanh cong"
+                )
+                self.presenter.exportData(responseData)
+            else:
+                responseData = AddProductOutputDTO(
+                    False,
+                    "Them hang hoa that bai"
+                )
+                self.presenter.exportData(responseData)

@@ -1,0 +1,23 @@
+from typing import List
+
+from GetTypeList.GetTypeListResponseData import GetTypeListResponseData
+from GetTypeList.GetTypeListViewModel import GetTypeListViewModel
+from Intefaces.OutputBoundary import OutputBoundary
+from Intefaces.Subject import Subject
+
+
+class GetTypeListPresenter(OutputBoundary, Subject):
+    def __init__(self, getTypeListViewModel: List['GetTypeListViewModel']):
+        Subject.__init__(self)
+        self.getTypeListViewModel = getTypeListViewModel
+        pass
+
+    def exportData(self, responseData: 'GetTypeListResponseData'):
+        for loaiHang in responseData.getLoaiHangs():
+            self.getTypeListViewModel.append(GetTypeListViewModel(loaiHang.tenLoai))
+
+        self.notify(self.getTypeListViewModel)
+        pass
+
+    def fetchTypeListViewModel(self):
+        return self.getTypeListViewModel

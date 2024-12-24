@@ -1,0 +1,7 @@
+class FindProductOutputDTO:
+    def __init__(self, maHang, tenHang, soLuongTon, donGia, maLoai):
+        self.maHang = maHang
+        self.tenHang = tenHang
+        self.soLuongTon = soLuongTon
+        self.donGia = donGia
+        self.maLoai = maLoai

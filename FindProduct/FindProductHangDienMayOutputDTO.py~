@@ -1,0 +1,9 @@
+from FindProduct.FindProductHangHoaOutputDTO import FindProductHangHoaOutputDTO
+
+
+class FindProductHangDienMayOutputDTO(FindProductHangHoaOutputDTO):
+    def __init__(self, maHang, tenHang, soLuongTon, donGia, maLoai,VAT, thoiGianBaoHanh, congSuat):
+        super().__init__(maHang, tenHang, soLuongTon, donGia, maLoai)
+        self.VAT = VAT
+        self.thoiGianBaoHanh = thoiGianBaoHanh
+        self.congSuat = congSuat

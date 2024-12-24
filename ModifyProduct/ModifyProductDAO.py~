@@ -1,0 +1,59 @@
+from Entity.HangDienMay import HangDienMay
+from Entity.HangHoa import HangHoa
+from Entity.HangSanhSu import HangSanhSu
+from Entity.HangThucPham import HangThucPham
+from Intefaces.DatabaseBoundary import DatabaseBoundary
+from connectdb import MysqlConnection
+
+
+class ModifyProductDAO(DatabaseBoundary):
+    def __init__(self):
+        super().__init__()
+
+    def modifyProductDatabase(self, product: HangHoa):
+        if not isinstance(product, HangHoa):
+            return False
+        connectdb = MysqlConnection.get_connection()
+
+        try:
+            # Bước 1: Update bảng hanghoa
+            query_hanghoa = """
+            UPDATE hanghoa 
+            SET tenHang = %s, soLuongTon = %s, donGia = %s, maLoai = %s
+            WHERE maHang = %s
+            """
+            self.cursor.execute(query_hanghoa, (product.tenHang, product.soLuongTon, product.donGia, product.maLoai, product.maHang))
+
+            # Bước 2: Update bảng chi tiết dựa trên loại sản phẩm
+            if isinstance(product, HangDienMay):
+                query_dienmay = """
+                UPDATE hangdienmay 
+                SET thoiGianBaoHanh = %s, congSuat = %s 
+                WHERE maHang = %s
+                """
+                self.cursor.execute(query_dienmay, (product.thoiGianBaoHanh, product.congSuat, product.maHang))
+
+            elif isinstance(product, HangSanhSu):
+                query_sanhsu = """
+                UPDATE hangsanhsu 
+                SET nhaSanXuat = %s, ngayNhapKho = %s 
+                WHERE maHang = %s
+                """
+                self.cursor.execute(query_sanhsu, (product.nhaSanXuat, product.ngayNhapKho, product.maHang))
+
+            elif isinstance(product, HangThucPham):
+                query_thucpham = """
+                UPDATE hangthucpham 
+                SET ngaySanXuat = %s, ngayHetHan = %s, nhaCungCap = %s 
+                WHERE maHang = %s
+                """
+                self.cursor.execute(query_thucpham, (product.ngaySanXuat, product.ngayHetHan, product.nhaCungCap, product.maHang))
+
+            # Bước 3: Commit thay đổi
+            self.conn.commit()
+            return True
+
+        except Exception as e:
+            print(f"Error updating product: {e}")
+            self.conn.rollback()
+            return False
